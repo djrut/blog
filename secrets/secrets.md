@@ -26,25 +26,25 @@ To create a new configuration, simply run  `gcloud init`, select 'Create a new c
 
 View all configured profiles:
 
-```
+```bash
 gcloud config configurations list
 ```
 
 Activate a particular profile:
 
-```
+```bash
 gcloud config configurations activate <name>
 ```
 
 I recommend creating shell aliases for these since you will be using them a lot. For example, for bash/zsh:
 
-```
+```bash
 alias gccl='gcloud config configurations list'
 alias gcca='gcloud config configurations activate'
 ```
 ### Configure environment
 
-```sh
+```bash
 export KEYRING=kms-secrets-demo-keyring
 export KEY=kms-secrets-demo-key
 export SVCACCT=<NAME>@developer.gserviceaccount.com
@@ -54,12 +54,12 @@ export SECRETS_BUCKET=gs://<BUCKET>
 
 ### Create keyring
 
-```sh
+```bash
 gcloud kms keyrings create $(KEYRING) --location=global
 ```
 
 ### Create key
-```sh
+```bash
 gcloud kms keys create $(KEY) --keyring=$(KEYRING) \
                               --location=global \
                               --purpose=encryption
@@ -67,7 +67,7 @@ gcloud kms keys create $(KEY) --keyring=$(KEYRING) \
 
 ### Create IAM policy binding
 
-```sh
+```bash
 gcloud kms keyrings add-iam-policy-binding $(KEYRING) \
 						--location=global \
 						--member serviceAccount:$(SVCACCT) \
@@ -86,7 +86,7 @@ user.passwd:password
 
 ### Encrypt secrets file
 
-```
+```bash
 gcloud kms encrypt --ciphertext-file=$(SECRETS_FILE).txt.enc \
                    --plaintext-file=$(SECRETS_FILE).txt \
                    --keyring=$(KEYRING) \
@@ -100,7 +100,7 @@ This step is important - to avoid mistakenly distributing the secrets file in pl
 
 ### Upload secrets file to GCS
 
-```
+```bash
 gsutil cp $(SECRETS_FILE).txt.enc $(SECRETS_BUCKET)
 ```
 
@@ -113,7 +113,7 @@ Now that we have an encypted secrets file residing on GCS, we can configure our 
 
 In order to avoid repeated download and decryption steps for each secret, we will first stream and decrypt the secrets to an environment variable (TODO: max size?)
  
-```
+```bash
 SECRETS=$(gsutil cat ${SECRETS_FILE} gcloud kms decrypt \
                --keyring=${KEYRING} \
                --key=${KEY} \
@@ -124,7 +124,7 @@ SECRETS=$(gsutil cat ${SECRETS_FILE} gcloud kms decrypt \
 
 Now that we have the secrets, it is simply a case of filtering for the property key and extracting the correct field value:
 
-```
+```bash
 USERNAME=$(echo $SECRETS \
          | grep ^user.name \
          | cut -d: -f2)
