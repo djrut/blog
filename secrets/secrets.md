@@ -16,6 +16,8 @@ Building upon the example cited above, this post will explore one possible mecha
 - Storage of encrypted secrets in GCS
 - Decryption of secrets in shell script and Python
 
+Note: Alternative approaches could be to use GCE instance metadata (assuming the consumer is running in context of GCE), and K8S secrets if running in containerized context. The GCS approach described here works across the range of GCP compute services (including App Engine).
+
 ## Prerequisites
 
 The examples that follows makes use of the gcloud SDK. Install this by following the guidance here.
@@ -134,15 +136,3 @@ USERNAME=$(echo $SECRETS \
 ```
 
 We now have the decrypted secret as an environment variable, with no intermediate files to cleanup. This step should be repeated for each unique property required. 
-
-## Alternative approaches
-
-### Instance metadata
-
-An alternative to using a secrets file is to populate instance metadata with key/value pairs. 
-
-[Does add-metadata accept STDIN?]
-[Should key also be encrypted?]
-
-### K8S secrets via env vars
-
