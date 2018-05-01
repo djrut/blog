@@ -1,6 +1,6 @@
 ## Motivation
 
-During the course of operating services and infrastructure, we often find ourselves handling small but sensitive datums such as API keys, username/passwords, security tokens and the like. For example, configuring a JDBC connection from an upstream service to a backend database usually involves three pieces of sensitive data: the connection string, the username and password. 
+During the course of operating services and infrastructure, we often find ourselves handling small but sensitive datums such as API keys, username/passwords, security tokens and the like. For example, configuring a database connection from an upstream service to a backend database usually involves three pieces of sensitive data: the connection string, the username and password. 
 
 There exist myriad mechanisms to communicate these small data items from the control plane to the underlying VM or container: instance metadata, K8S configmaps, environment variables and so on.
 
@@ -8,10 +8,13 @@ However these mechanisms do not offer any guarantees around integrity/confidenti
 
 ## Scenario
 
-Building upon the example cited above, this post will explore a couple of mechanisms to achieve our goal, using only native GCP services. We will present two approaches:
+Building upon the example cited above, this post will explore one possible mechanism to achieve our goal, using only native GCP services. We will present the following approach:
 
-- GCE: Using a secrets file located on GCS within a startup script
-- K8S: Using secrets passed via environment variables 
+- Construction of a plain-text secrets file
+- Creation of KMS keyring/keys
+- Encryption of plain-text secrets file using KMS key
+- Storage of encrypted secrets in GCS
+- Decryption of secrets in shell script and Python
 
 ## Prerequisites
 
